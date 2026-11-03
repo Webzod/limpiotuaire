@@ -43,6 +43,7 @@
     document.body.classList.add("show-contacto");
     homeView.setAttribute("aria-hidden", "true");
     contactView.setAttribute("aria-hidden", "false");
+    contactView.querySelectorAll(".reveal").forEach((item) => item.classList.add("is-visible"));
     document.querySelector(".site-footer")?.setAttribute("aria-hidden", "true");
     closeMenu();
     setActiveMobileNav("contacto");
@@ -279,48 +280,52 @@
     });
   });
 
-  // Validación del formulario y apertura del cliente de correo (sin backend).
+  // Validación del formulario y preparación de la solicitud en WhatsApp.
   const form = document.querySelector("#contact-form");
   const feedback = document.querySelector("#form-feedback");
+  const formStatus = document.querySelector("#form-status");
+  const whatsappLink = document.querySelector("#form-whatsapp-link");
   const validationRules = [
-    { name: "name", error: "name-error", message: "Escribe tu nombre (mínimo 2 caracteres).", valid: (value) => value.trim().length >= 2 },
-    { name: "phone", error: "phone-error", message: "Ingresa un teléfono válido (7 a 20 caracteres).", valid: (value) => /^[0-9+() .-]{7,20}$/.test(value.trim()) },
+    { name: "name", error: "name-error", message: "Escribe tu nombre completo (mínimo 3 caracteres).", valid: (value) => value.trim().length >= 3 },
     { name: "email", error: "email-error", message: "Ingresa un correo electrónico válido.", valid: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) },
     { name: "service", error: "service-error", message: "Selecciona el servicio que necesitas.", valid: (value) => value.trim().length > 0 },
+    { name: "units", error: "units-error", message: "Indica cuántos equipos necesitas atender.", valid: (value) => value.trim().length > 0 },
     { name: "message", error: "message-error", message: "Cuéntanos un poco más (mínimo 10 caracteres).", valid: (value) => value.trim().length >= 10 },
   ];
   validationRules.forEach((rule) => {
     const field = form?.elements.namedItem(rule.name);
     field?.addEventListener("input", () => {
       field.removeAttribute("aria-invalid");
-      const error = document.getElementById(rule.error);
-      if (error) error.textContent = "";
+      field.closest(".form-group")?.classList.remove("has-error");
       if (feedback) feedback.textContent = "";
     });
     field?.addEventListener("change", () => {
       field.removeAttribute("aria-invalid");
-      const error = document.getElementById(rule.error);
-      if (error) error.textContent = "";
+      field.closest(".form-group")?.classList.remove("has-error");
       if (feedback) feedback.textContent = "";
     });
   });
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
-    if (!form || !feedback) return;
+    if (!form || !feedback || !formStatus || !whatsappLink) return;
     feedback.textContent = "";
     feedback.classList.remove("is-error");
+    formStatus.hidden = true;
     let firstInvalid;
     validationRules.forEach((rule) => {
       const field = form.elements.namedItem(rule.name);
-      const error = document.getElementById(rule.error);
       const isValid = field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement
         ? rule.valid(field.value)
         : false;
-      if (error) error.textContent = isValid ? "" : rule.message;
       if (field instanceof HTMLElement) {
-        if (isValid) field.removeAttribute("aria-invalid");
+        const group = field.closest(".form-group");
+        if (isValid) {
+          field.removeAttribute("aria-invalid");
+          group?.classList.remove("has-error");
+        }
         else {
           field.setAttribute("aria-invalid", "true");
+          group?.classList.add("has-error");
           firstInvalid ||= field;
         }
       }
@@ -331,19 +336,26 @@
       feedback.classList.add("is-error");
       return;
     }
-    const contactEmail = form.dataset.contactEmail?.trim();
-    if (!contactEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
-      feedback.textContent = "No se puede enviar esta solicitud todavía: falta configurar el correo de contacto.";
+    const whatsappNumber = form.dataset.whatsappNumber?.replace(/\D/g, "");
+    if (!whatsappNumber || !/^[1-9]\d{7,14}$/.test(whatsappNumber)) {
+      feedback.textContent = "No se puede preparar la solicitud: falta configurar el número de WhatsApp del negocio.";
       feedback.classList.add("is-error");
       return;
     }
     const formData = new FormData(form);
-    const subject = encodeURIComponent(`Cotización de servicio: ${formData.get("service")}`);
-    const body = encodeURIComponent(
-      `Nombre: ${formData.get("name")}\nTeléfono: ${formData.get("phone")}\nCorreo: ${formData.get("email")}\nServicio: ${formData.get("service")}\n\nMensaje:\n${formData.get("message")}`,
-    );
-    feedback.textContent = "Se abrirá tu aplicación de correo para que puedas enviar la solicitud.";
-    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+    const company = String(formData.get("company") || "").trim();
+    const message = [
+      "Hola, quiero solicitar una cotización para mi aire acondicionado.",
+      `Nombre: ${String(formData.get("name")).trim()}`,
+      `Correo: ${String(formData.get("email")).trim()}`,
+      ...(company ? [`Empresa: ${company}`] : []),
+      `Servicio: ${String(formData.get("service"))}`,
+      `Cantidad de equipos: ${String(formData.get("units"))}`,
+      `Mensaje: ${String(formData.get("message")).trim()}`,
+    ].join("\n");
+    whatsappLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    formStatus.hidden = false;
+    window.open(whatsappLink.href, "_blank", "noopener,noreferrer");
   });
 
   // Brillo ripple de botones sin mantener nodos innecesarios.

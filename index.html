@@ -247,15 +247,62 @@
           </div>
           <div class="map-placeholder"><span aria-hidden="true">✳</span><b>Atención en Anzoátegui</b><small>La disponibilidad puede variar según la ubicación.</small></div>
         </div>
-        <form class="contact-form reveal" id="contact-form" data-contact-email="cotizaciones@example.com" novalidate>
-          <h3>Solicita tu cotización</h3><p>Cuéntanos un poco del trabajo que tienes en mente.</p>
-          <div class="form-row"><label for="form-name">Nombre completo<input id="form-name" name="name" autocomplete="name" required minlength="2" placeholder="¿Cómo te llamas?"><span class="field-error" id="name-error"></span></label><label for="form-phone">Teléfono<input id="form-phone" name="phone" type="tel" autocomplete="tel" required pattern="[0-9+() .-]{7,20}" placeholder="+58 412 123 4567"><span class="field-error" id="phone-error"></span></label></div>
-          <label for="form-email">Correo electrónico<input id="form-email" name="email" type="email" autocomplete="email" required placeholder="tu@correo.com"><span class="field-error" id="email-error"></span></label>
-          <label for="form-service">¿Qué servicio necesitas?<select id="form-service" name="service" required><option value="">Selecciona un servicio</option><option>Limpieza de aire split</option><option>Limpieza de aire de ventana</option><option>Limpieza de ductos</option><option>Desinfección antibacterial</option><option>Mantenimiento preventivo</option><option>Revisión de gas o reparación</option><option>Servicio empresarial</option><option>Otro</option></select><span class="field-error" id="service-error"></span></label>
-          <label for="form-message">Cuéntanos un poco más<textarea id="form-message" name="message" rows="4" required minlength="10" placeholder="Tipo de equipo, cantidad y zona..."></textarea><span class="field-error" id="message-error"></span></label>
-          <button class="button button--primary button--submit ripple" type="submit">Preparar solicitud <span aria-hidden="true">↗</span></button>
-          <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
-          <small class="form-note">Datos de contacto de demostración. Sustitúyelos antes de publicar el sitio.</small>
+        <form class="contact-form contact-form-wrapper reveal" id="contact-form" data-whatsapp-number="" novalidate>
+          <h3>Solicita tu cotización</h3>
+          <p class="contact-form__intro">Cuéntanos sobre los equipos y te orientamos con el servicio adecuado.</p>
+          <div class="form-group">
+            <label for="form-name">Nombre completo *</label>
+            <input id="form-name" name="name" autocomplete="name" aria-describedby="name-error" required minlength="3">
+            <span class="error-msg" id="name-error">Escribe tu nombre completo (mínimo 3 caracteres).</span>
+          </div>
+          <div class="form-group">
+            <label for="form-email">Correo electrónico *</label>
+            <input id="form-email" name="email" type="email" autocomplete="email" aria-describedby="email-error" required>
+            <span class="error-msg" id="email-error">Escribe un correo electrónico válido.</span>
+          </div>
+          <div class="form-group">
+            <label for="form-company">Empresa <span class="form-optional">(opcional)</span></label>
+            <input id="form-company" name="company" autocomplete="organization">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-service">Tipo de servicio *</label>
+              <select id="form-service" name="service" aria-describedby="service-error" required>
+                <option value="" disabled selected>Selecciona una opción</option>
+                <option value="Limpieza de aire split">Limpieza de aire split</option>
+                <option value="Limpieza de aire de ventana">Limpieza de aire de ventana</option>
+                <option value="Limpieza de ductos">Limpieza de ductos</option>
+                <option value="Mantenimiento preventivo">Mantenimiento preventivo</option>
+                <option value="Revisión o reparación">Revisión o reparación</option>
+                <option value="Servicio empresarial">Servicio empresarial</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <span class="error-msg" id="service-error">Selecciona el servicio que necesitas.</span>
+            </div>
+            <div class="form-group">
+              <label for="form-units">Cantidad de equipos *</label>
+              <select id="form-units" name="units" aria-describedby="units-error" required>
+                <option value="" disabled selected>Selecciona una opción</option>
+                <option value="1 equipo">1 equipo</option>
+                <option value="2 a 3 equipos">2 a 3 equipos</option>
+                <option value="4 o más equipos">4 o más equipos</option>
+                <option value="No estoy seguro">No estoy seguro</option>
+              </select>
+              <span class="error-msg" id="units-error">Indica cuántos equipos necesitas atender.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="form-message">Mensaje *</label>
+            <textarea id="form-message" name="message" rows="4" aria-describedby="message-error" required minlength="10" placeholder="Cuéntanos el tipo de equipo y tu zona..."></textarea>
+            <span class="error-msg" id="message-error">Cuéntanos un poco más (mínimo 10 caracteres).</span>
+          </div>
+          <p class="form-privacy">Al continuar, tus datos se compartirán con WhatsApp para preparar el mensaje; solo se enviarán al negocio cuando confirmes el envío.</p>
+          <button class="button button--primary button--submit ripple" type="submit">Enviar mensaje <span aria-hidden="true">↗</span></button>
+          <p class="form-feedback" id="form-feedback" role="alert" aria-live="assertive"></p>
+          <div class="form-status" id="form-status" role="status" aria-live="polite" hidden>
+            <p>Tu solicitud está lista. Confirma el envío en WhatsApp o <a id="form-whatsapp-link" href="#" target="_blank" rel="noopener noreferrer">abre WhatsApp desde aquí</a>.</p>
+          </div>
+          <small class="form-note">WhatsApp de prueba sin configurar. Sustituye el número antes de publicar.</small>
         </form>
       </div>
     </section>
@@ -268,7 +315,14 @@
       <div class="footer-links"><h3>Explora</h3><a href="#servicios">Servicios</a><a href="#proceso">Nuestro proceso</a><a href="#planes">Cotizaciones</a><a href="#preguntas">Preguntas frecuentes</a></div>
       <div class="footer-links"><h3>¿Lo revisamos?</h3><a href="#contacto">Solicitar una cotización</a><a href="#compromiso">Nuestro enfoque</a><span>Anzoátegui, Venezuela</span></div>
     </div>
-    <div class="footer-bottom wrap"><p>© <span id="current-year"></span> Yo limpio tu aire. Todos los derechos reservados.</p><p>Hecho para que respires mejor <span aria-hidden="true">♡</span></p></div>
+    <div class="footer-bottom wrap">
+      <p class="footer-credit">
+        <span>© <span id="current-year"></span> Yo limpio tu aire. Todos los derechos reservados.</span>
+        <span class="footer-credit__separator" aria-hidden="true">|</span>
+        <span>Desarrollado por <a href="https://zenitcorex.vercel.app/" target="_blank" rel="noopener noreferrer">Zénit</a></span>
+      </p>
+      <p>Hecho para que respires mejor <span aria-hidden="true">♡</span></p>
+    </div>
   </footer>
   <a class="contact-float" href="#contacto" aria-label="Solicitar una cotización"><span aria-hidden="true">↗</span></a>
   <button class="back-to-top" type="button" aria-label="Volver arriba">↑</button>
